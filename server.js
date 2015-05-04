@@ -18,7 +18,7 @@ app.use(expressJwt({secret: jwtSecret}).unless({
 
 app.use(function (err, req, res, next) {
 	if (err.name === 'UnauthorizedError') {
-		res.status(401).end('Unauthorized');
+		return res.status(401).end('Unauthorized');
 	}
 	next();
 });

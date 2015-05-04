@@ -10,8 +10,25 @@ module.exports = function (app) {
 	var config = app.get('config');
 	var jwtSecret = config.JWT_SECRET;
 
-	app.get('/users/me', function (req, res) {
-		res.send(req.user);
+	app.get('/users/current', function (req, res) {
+		if (req.user && req.user.username) {
+			Users.findOne({
+				username: req.user.username
+			}).lean().exec(function (err, user) {
+				if (err) {
+					return res.status(503).end(err);
+				}
+
+				if (!user) {
+					return res.status(401).end('user not found');
+				}
+
+				res.send(user);
+			})
+		} else {
+			return res.status(503).end();
+		}
+
 	});
 
 	app.post('/users/register', register, auth, _.noop);
